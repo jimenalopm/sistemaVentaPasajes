@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">   <!-- para que se vea bien en los celulares ya que booststrap es responsive entonces  width=device-width hace q use el ancho real y initial-scale=1.0 para que no haga zoom-->
+    <title>{% block title %}Sistema de Buses{% endblock %}</title>   <!-- block title se usa para poner un titulo como default pero si en otros html hijos se cambia se usa esa , esto es de django no html normal -->
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> <!-- para descargar bootstrap -->
+</head>
+<body>
+
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark"> <!-- barra de navegacion  -->
+    <div class="container">
+        <a class="navbar-brand" href="/rutas/">🚌 Sistema de Buses</a>
+        <div class="navbar-nav ms-auto">
+            {% if user.is_authenticated %}
+                <span class="navbar-text text-light me-3">
+                    Hola, {{ user.cliente.nombre }}
+                </span>
+                <a class="nav-link" href="/usuarios/logout/">Cerrar sesión</a>
+            {% else %}
+                <a class="nav-link" href="/usuarios/login/">Iniciar sesión</a>
+                <a class="nav-link" href="/usuarios/registro/">Registrarse</a>
+            {% endif %}<!-- si esta logueado le dice hola y el nombre con  la opcion de cerrar sesion si no lo esta le da la opcion de registrarse o iniciar sesion -->
+        </div>
+    </div>
+</nav>
+
+<!-- alertas -->
+<div class="container mt-3">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+</div> <!-- desde la views se manda un mensaje y depende de cual esa este se muestra -->
+
+<!-- aqui el contenido que cada subpagina va a tener y va a rellenar aqui manteniendo la barra de navegacion en todas sin repetir el codigo -->
+<div class="container mt-4">
+    {% block content %}
+    {% endblock %}
+</div>
+
+<!-- Bootstrap JS se pone al final para que la pagina cargue mejor -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> 
+</body>
+</html>
