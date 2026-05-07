@@ -47,6 +47,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # aqui se agregan las apps de proyecto
+    "usuarios",
+    "rutas",
+    "tiquetes",
 ]
 
 MIDDLEWARE = [
