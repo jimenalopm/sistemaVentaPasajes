@@ -1,0 +1,261 @@
+[
+  {
+    "model": "rutas.ruta",
+    "pk": 1,
+    "fields": {
+      "lugar_salida": "Costa Rica",
+      "lugar_llegada": "Nicaragua",
+      "precio": "80.00",
+      "codigo_ruta": "CR-NI"
+    }
+  },
+  {
+    "model": "rutas.ruta",
+    "pk": 2,
+    "fields": {
+      "lugar_salida": "Costa Rica",
+      "lugar_llegada": "El Salvador",
+      "precio": "120.00",
+      "codigo_ruta": "CR-ES"
+    }
+  },
+  {
+    "model": "rutas.ruta",
+    "pk": 3,
+    "fields": {
+      "lugar_salida": "Costa Rica",
+      "lugar_llegada": "Guatemala",
+      "precio": "140.00",
+      "codigo_ruta": "CR-GUA"
+    }
+  },
+  {
+    "model": "rutas.ruta",
+    "pk": 4,
+    "fields": {
+      "lugar_salida": "Costa Rica",
+      "lugar_llegada": "Honduras",
+      "precio": "110.00",
+      "codigo_ruta": "CR-HN"
+    }
+  },
+  {
+    "model": "rutas.ruta",
+    "pk": 5,
+    "fields": {
+      "lugar_salida": "Costa Rica",
+      "lugar_llegada": "Panama",
+      "precio": "80.00",
+      "codigo_ruta": "CR-PN"
+    }
+  },
+  {
+    "model": "rutas.ruta",
+    "pk": 6,
+    "fields": {
+      "lugar_salida": "Panama",
+      "lugar_llegada": "Costa Rica",
+      "precio": "80.00",
+      "codigo_ruta": "PN-CR"
+    }
+  },
+  {
+    "model": "rutas.ruta",
+    "pk": 7,
+    "fields": {
+      "lugar_salida": "Guatemala",
+      "lugar_llegada": "Costa Rica",
+      "precio": "140.00",
+      "codigo_ruta": "GUA-CR"
+    }
+  },
+  {
+    "model": "rutas.ruta",
+    "pk": 8,
+    "fields": {
+      "lugar_salida": "Guatemala",
+      "lugar_llegada": "El Salvador",
+      "precio": "80.00",
+      "codigo_ruta": "GUA-ES"
+    }
+  },
+  {
+    "model": "rutas.ruta",
+    "pk": 9,
+    "fields": {
+      "lugar_salida": "Guatemala",
+      "lugar_llegada": "Honduras",
+      "precio": "110.00",
+      "codigo_ruta": "GUA-HN"
+    }
+  },
+  {
+    "model": "rutas.ruta",
+    "pk": 10,
+    "fields": {
+      "lugar_salida": "Guatemala",
+      "lugar_llegada": "Nicaragua",
+      "precio": "120.00",
+      "codigo_ruta": "GUA-NI"
+    }
+  },
+  {
+    "model": "rutas.ruta",
+    "pk": 11,
+    "fields": {
+      "lugar_salida": "Nicaragua",
+      "lugar_llegada": "Costa Rica",
+      "precio": "80.00",
+      "codigo_ruta": "NI-CR"
+    }
+  },
+  {
+    "model": "rutas.horario",
+    "pk": 1,
+    "fields": {
+      "ruta": 1,
+      "hora_salida": "03:00:00"
+    }
+  },
+  {
+    "model": "rutas.horario",
+    "pk": 2,
+    "fields": {
+      "ruta": 1,
+      "hora_salida": "06:00:00"
+    }
+  },
+  {
+    "model": "rutas.horario",
+    "pk": 3,
+    "fields": {
+      "ruta": 2,
+      "hora_salida": "06:00:00"
+    }
+  },
+  {
+    "model": "rutas.horario",
+    "pk": 4,
+    "fields": {
+      "ruta": 3,
+      "hora_salida": "06:00:00"
+    }
+  },
+  {
+    "model": "rutas.horario",
+    "pk": 5,
+    "fields": {
+      "ruta": 4,
+      "hora_salida": "06:00:00"
+    }
+  },
+  {
+    "model": "rutas.horario",
+    "pk": 6,
+    "fields": {
+      "ruta": 5,
+      "hora_salida": "05:00:00"
+    }
+  },
+  {
+    "model": "rutas.horario",
+    "pk": 7,
+    "fields": {
+      "ruta": 6,
+      "hora_salida": "08:00:00"
+    }
+  },
+  {
+    "model": "rutas.horario",
+    "pk": 8,
+    "fields": {
+      "ruta": 7,
+      "hora_salida": "05:00:00"
+    }
+  },
+  {
+    "model": "rutas.horario",
+    "pk": 9,
+    "fields": {
+      "ruta": 8,
+      "hora_salida": "05:00:00"
+    }
+  },
+  {
+    "model": "rutas.horario",
+    "pk": 10,
+    "fields": {
+      "ruta": 9,
+      "hora_salida": "05:00:00"
+    }
+  },
+  {
+    "model": "rutas.horario",
+    "pk": 11,
+    "fields": {
+      "ruta": 10,
+      "hora_salida": "05:00:00"
+    }
+  },
+  {
+    "model": "rutas.horario",
+    "pk": 12,
+    "fields": {
+      "ruta": 11,
+      "hora_salida": "03:00:00"
+    }
+  },
+  {
+    "model": "rutas.horario",
+    "pk": 13,
+    "fields": {
+      "ruta": 11,
+      "hora_salida": "06:00:00"
+    }
+  },
+  {
+    "model": "rutas.bus",
+    "pk": "BUS-101",
+    "fields": {
+      "modelo": "Mercedes",
+      "capacidad": 50,
+      "estado": "Activo"
+    }
+  },
+  {
+    "model": "rutas.bus",
+    "pk": "BUS-102",
+    "fields": {
+      "modelo": "Volvo",
+      "capacidad": 48,
+      "estado": "Activo"
+    }
+  },
+  {
+    "model": "rutas.bus",
+    "pk": "BUS-103",
+    "fields": {
+      "modelo": "Scania",
+      "capacidad": 52,
+      "estado": "Activo"
+    }
+  },
+  {
+    "model": "rutas.bus",
+    "pk": "BUS-104",
+    "fields": {
+      "modelo": "Yutong",
+      "capacidad": 50,
+      "estado": "Mantenimiento"
+    }
+  },
+  {
+    "model": "rutas.bus",
+    "pk": "BUS-105",
+    "fields": {
+      "modelo": "Higer",
+      "capacidad": 46,
+      "estado": "Activo"
+    }
+  }
+]
