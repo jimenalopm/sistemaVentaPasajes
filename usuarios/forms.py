@@ -49,3 +49,12 @@ class RegistroForm(
             raise forms.ValidationError("Este correo ya está registrado")
 
         return cleaned_data  # si no existieron errores se pasa a la parte de views aqui nada mas se hacen comprobaciones de que la informacion este bien
+
+
+#/////////////////////////////////////////////////////////
+from django.contrib.auth.forms import AuthenticationForm
+
+class LoginForm(AuthenticationForm):
+    # Personalizamos los widgets para que se vean bien (opcional)
+    username = forms.EmailField(label="Correo electrónico", widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    password = forms.CharField(label="Contraseña", widget=forms.PasswordInput(attrs={'class': 'form-control'}))

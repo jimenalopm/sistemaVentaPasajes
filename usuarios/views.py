@@ -3,7 +3,9 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from .forms import RegistroForm
 from .models import Cliente
-
+#/////////////////////////////
+from django.contrib.auth import authenticate, login, logout # Añade estas importaciones arriba
+from .forms import LoginForm # Importa el nuevo formulario
 
 def registro(
     request,
@@ -39,12 +41,27 @@ def registro(
         request, "usuarios/registro.html", {"form": form}
     )  # si es la primera vez o si falla el registro muestra el formulario
 
-
+#//////////////////////////////////////////////////////////
 def login_view(request):
-    return render(request, "usuarios/login.html")
+    if request.method == "POST":
+        # AuthenticationForm recibe el request y los datos del POST
+        form = LoginForm(request, data=request.POST)
+        if form.is_valid():
+            # Si el formulario es válido, el usuario ya fue autenticado internamente
+            user = form.get_user()
+            login(request, user)  # Crea la sesión en el navegador
+            messages.success(request, f"Bienvenido de nuevo, {user.email}")
+            
+            # Redirige a la página principal del sistema (ejemplo: lista de rutas)
+            # Asegúrate de que 'rutas:lista_rutas' exista en tus URLs
+            return redirect("/") #ESTO SE CAMBIA A LA RUTA QUE SE DESEA REEDIRECCIONAR
+    else:
+        form = LoginForm()
 
+    return render(request, "usuarios/login.html", {"form": form})
 
+# --- NUEVA LÓGICA DE LOGOUT ---
 def logout_view(request):
-    from django.http import HttpResponse
-
-    return HttpResponse("logout - próximamente")
+    logout(request)  # Elimina la sesión del usuario
+    messages.info(request, "Has cerrado sesión correctamente.")
+    return redirect("/")
