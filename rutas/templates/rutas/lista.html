@@ -1,8 +1,62 @@
 {% extends 'base.html' %}
 
-{% block title %}Rutas disponibles{% endblock %}
+{% block title %}Inicio - Transportes Centroamericanos{% endblock %}
 
 {% block content %}
-    <h2>Hola desde la página de rutas 🚌</h2>
-    <p>Aquí van a aparecer los viajes disponibles.</p>
+<div class="container mt-4">
+    <div class="p-5 mb-5 bg-body-tertiary rounded-5 shadow-lg text-center border">
+        <div class="container-fluid py-4">
+            
+            <div class="mb-4 display-6">
+                🇸🇻 🇭🇳 🇳🇮 🇨🇷 🇵🇦
+            </div>
+
+            <h1 class="display-4 fw-bold text-dark mb-3">
+                CONECTANDO <span class="text-primary">CENTROAMÉRICA</span>
+            </h1>
+            
+            <p class="col-md-8 mx-auto fs-5 text-secondary mb-4">
+                Somos líderes en el transporte terrestre de pasajeros, vinculando y comprometiendo a las comunidades de la zona sur con rutas seguras y eficientes.
+            </p>
+
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'rutas:lista_rutas' %}" class="btn btn-primary btn-lg px-5 rounded-pill shadow">
+                    Buscar Pasajes
+                </a>
+                <button class="btn btn-outline-dark btn-lg px-5 rounded-pill">
+                    Sobre Nosotros
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center g-4 pb-5">
+        
+        <div class="col-md-5">
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-3 text-center">
+                <div class="card-body d-flex flex-column">
+                    <div class="display-4 mb-3 text-primary">🗺️</div>
+                    <h3 class="fw-bold h4">Rutas y Horarios</h3>
+                    <p class="text-muted flex-grow-1">Consulta salidas y destinos de forma rápida y sencilla.</p>
+                    <a href="{% url 'rutas:lista_rutas' %}" class="btn btn-link text-decoration-none fw-bold">
+                        Ver detalles →
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-3 text-center">
+                <div class="card-body d-flex flex-column">
+                    <div class="display-4 mb-3 text-success">💳</div>
+                    <h3 class="fw-bold h4">Compras en línea</h3>
+                    <p class="text-muted flex-grow-1">Asegura tu espacio sin filas. Pago seguro y rápido.</p>
+                    <a href="{% url 'rutas:lista_rutas' %}" class="btn btn-link text-decoration-none fw-bold text-success">
+                        Comprar ahora →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
