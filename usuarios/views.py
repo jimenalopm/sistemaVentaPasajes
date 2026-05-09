@@ -1,28 +1,26 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .forms import RegistroForm
-from .models import Cliente
-#/////////////////////////////
-from django.contrib.auth import authenticate, login, logout # Añade estas importaciones arriba
-from .forms import LoginForm # Importa el nuevo formulario
+from django.contrib.auth import authenticate, login, logout
+from .forms import RegistroForm, LoginForm
+from .models import Cliente, Tarjeta
 
-def registro(
-    request,
-):  # los views en Django responde a peticiones HTTP donde reciben un request(tiene toda la informacion)  y tiene dos metodos get para por ejemplo dame esta pagina y post cuando manda datos para procesarlos
-    if request.method == "POST":  # si el usuario mando datos para procesar
-        form = RegistroForm(
-            request.POST
-        )  # Creo un objeto formulario y le meto los datos del usuario para que después los pueda validar
-        if form.is_valid():  #  Valida los campos segun las restricciones de la clase, despues llama a clean() para las validaciones extras, y retorna True si todo paso , ademas crea clean data dentro del objeto
-            # Crear el User de Django
-            user = User.objects.create_user(  # create_user hashea automaticamente
+
+def registro(request):
+    if request.method == "POST":
+        form = RegistroForm(request.POST)
+        if form.is_valid():
+
+            #Paso 1: Crear el User de Django 
+            # create_user hashea la contraseña automáticamente, nunca se guarda en texto plano
+            user = User.objects.create_user(
                 username=form.cleaned_data["email"],
                 email=form.cleaned_data["email"],
                 password=form.cleaned_data["password1"],
             )
-            # Crear el Cliente vinculado al User
-            Cliente.objects.create(
+
+            #  Paso 2: Crear el Cliente vinculado al User 
+            cliente = Cliente.objects.create(
                 user=user,
                 nombre=form.cleaned_data["nombre"],
                 apellido=form.cleaned_data["apellido"],
@@ -30,38 +28,43 @@ def registro(
                 nacionalidad=form.cleaned_data["nacionalidad"],
                 telefono=form.cleaned_data["telefono"],
             )
-            messages.success(request, "Cuenta creada!! Iniciá sesión")
-            return redirect(
-                "usuarios:login"
-            )  # si  se logra registrar lo redirige a el login
-    else:  # si no mando datos entonces significa que no los lleno muestre el formulario
+
+            #  Paso 3: Crear la Tarjeta vinculada al Cliente 
+            # Aquí es lo nuevo: guardamos la tarjeta en la misma operación del registro
+            Tarjeta.objects.create(
+                cliente=cliente,
+                numero_tarjeta=form.cleaned_data["numero_tarjeta"],
+                ccv=form.cleaned_data["ccv"],
+                fecha_vencimiento=form.cleaned_data["fecha_vencimiento"],
+                titular=form.cleaned_data["titular_tarjeta"],
+                tipo=form.cleaned_data["tipo_tarjeta"],
+            )
+
+            messages.success(request, "¡Cuenta creada exitosamente! Iniciá sesión.")
+            return redirect("usuarios:login")
+
+    else:
+        # Si el usuario apenas abre la página, mostramos el formulario vacío
         form = RegistroForm()
 
-    return render(
-        request, "usuarios/registro.html", {"form": form}
-    )  # si es la primera vez o si falla el registro muestra el formulario
+    return render(request, "usuarios/registro.html", {"form": form})
 
-#//////////////////////////////////////////////////////////
+
 def login_view(request):
     if request.method == "POST":
-        # AuthenticationForm recibe el request y los datos del POST
         form = LoginForm(request, data=request.POST)
         if form.is_valid():
-            # Si el formulario es válido, el usuario ya fue autenticado internamente
             user = form.get_user()
-            login(request, user)  # Crea la sesión en el navegador
-            messages.success(request, f"Bienvenido de nuevo, {user.email}")
-            
-            # Redirige a la página principal del sistema (ejemplo: lista de rutas)
-            # Asegúrate de que 'rutas:lista_rutas' exista en tus URLs
-            return redirect("/") #ESTO SE CAMBIA A LA RUTA QUE SE DESEA REEDIRECCIONAR
+            login(request, user)  # esto crea la sesión en el navegador
+            messages.success(request, f"¡Bienvenido de nuevo, {user.cliente.nombre}!")
+            return redirect("rutas:lista_rutas")
     else:
         form = LoginForm()
 
     return render(request, "usuarios/login.html", {"form": form})
 
-# --- NUEVA LÓGICA DE LOGOUT ---
+
 def logout_view(request):
-    logout(request)  # Elimina la sesión del usuario
-    messages.info(request, "Has cerrado sesión correctamente.")
+    logout(request)  # elimina la sesión
+    messages.info(request, "Cerraste sesión correctamente.")
     return redirect("/")

@@ -1,60 +1,88 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import AuthenticationForm
 from .models import Cliente
 
 
-class RegistroForm(
-    forms.Form
-):  # los formularios tienen que ir con forms.forma asi Django ya sabe que es un formulario y agrega funcionalidades
-    # Datos del User
+class RegistroForm(forms.Form):
+
+    #Datos de la cuenta 
     email = forms.EmailField(
         label="Correo electrónico"
-    )  # emailfield hace q se haga la verificacion de que si tenga lo necesario para ser un email
+    )
     password1 = forms.CharField(
-        label="Contraseña", widget=forms.PasswordInput
-    )  # widget=forms.PasswordInput para que no se vea la contrasena al escribirla
+        label="Contraseña",
+        widget=forms.PasswordInput
+    )
     password2 = forms.CharField(
-        label="Confirmar contraseña", widget=forms.PasswordInput
+        label="Confirmar contraseña",
+        widget=forms.PasswordInput
     )
 
-    # Datos del Cliente
+    # Datos personales 
     nombre = forms.CharField(label="Nombre", max_length=50)
-    apellido = forms.CharField(label="Apellido", max_length=50)
+    apellido = forms.CharField(label="Apellidos", max_length=50)
     pasaporte = forms.CharField(label="Pasaporte", max_length=20)
     nacionalidad = forms.CharField(label="Nacionalidad", max_length=50)
-    telefono = forms.CharField(
-        label="Teléfono", max_length=20, required=False
-    )  # todos se verifica q no se pase del tamano maximo de la DB y en telefono permite q lo pueda mandar sin esto como en la db
+    telefono = forms.CharField(label="Teléfono", max_length=20, required=False)
 
+    # Datos de la tarjeta 
+    # El enunciado pide: Tarjeta, CCV y fecha de vencimiento
+    numero_tarjeta = forms.CharField(
+        label="Número de tarjeta",
+        max_length=20,
+        widget=forms.TextInput(attrs={"placeholder": "1234 5678 9012 3456"})
+    )
+    ccv = forms.CharField(
+        label="CCV",
+        max_length=4,
+        widget=forms.TextInput(attrs={"placeholder": "123"})
+    )
+    fecha_vencimiento = forms.DateField(
+        label="Fecha de vencimiento",
+        widget=forms.DateInput(attrs={"type": "date"})
+        # type=date hace que aparezca el selector de fecha en el navegador
+    )
+    titular_tarjeta = forms.CharField(
+        label="Nombre del titular",
+        max_length=100,
+        widget=forms.TextInput(attrs={"placeholder": "Como aparece en la tarjeta"})
+    )
+    tipo_tarjeta = forms.ChoiceField(
+        label="Tipo de tarjeta",
+        choices=[
+            ("", "-- Seleccioná --"),
+            ("Visa", "Visa"),
+            ("Mastercard", "Mastercard"),
+            ("American Express", "American Express"),
+        ]
+    )
+
+    # Validaciones extra 
     def clean(self):
-        cleaned_data = super().clean()  # esta funcion devuelve el diccionario si la validacion fue correcta, la que hace la validacion con las restricciones de arriba es la funcion valid que esta en view
+        cleaned_data = super().clean()
+
+        # Verificar que las contraseñas coincidan
         p1 = cleaned_data.get("password1")
-        p2 = cleaned_data.get(
-            "password2"
-        )  # sacamos las dos contrasenas del diccionario para poder usarlas abajo
+        p2 = cleaned_data.get("password2")
+        if p1 and p2 and p1 != p2:
+            raise forms.ValidationError("Las contraseñas no coinciden.")
 
-        # Validar que las contraseñas coincidan
-        if (
-            p1 and p2 and p1 != p2
-        ):  # p1 tiene valor ? and p2 tiene valor ?  esto para que no dar 2 errores por que si esta vacio le va a dar el de que no puede estar vacio , despues se verifica si son iguales y si no lo son se lo dice
-            raise forms.ValidationError(
-                "Las contraseñas no coinciden"
-            )  # raise lanza una excepcion y detiene la ejecucion  mostrando el mensaje del error, form.validationerror funciona bien con Django y muestra el mensaje de error de mejor forma
+        # Verificar que el correo no esté ya registrado
+        email = cleaned_data.get("email")
+        if email and User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Este correo ya está registrado.")
 
-        email = cleaned_data.get("email")  # saca el email del diccionario para usarlo
-
-        if (
-            email and User.objects.filter(email=email).exists()
-        ):  # primero verifica si no esta vacio para ni siquiera buscar,  y la otra funcion es una que trae Django para buscar si existe algun email igual
-            raise forms.ValidationError("Este correo ya está registrado")
-
-        return cleaned_data  # si no existieron errores se pasa a la parte de views aqui nada mas se hacen comprobaciones de que la informacion este bien
+        return cleaned_data
 
 
-#/////////////////////////////////////////////////////////
-from django.contrib.auth.forms import AuthenticationForm
-
+# Formulario de login 
 class LoginForm(AuthenticationForm):
-    # Personalizamos los widgets para que se vean bien (opcional)
-    username = forms.EmailField(label="Correo electrónico", widget=forms.EmailInput(attrs={'class': 'form-control'}))
-    password = forms.CharField(label="Contraseña", widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    username = forms.EmailField(
+        label="Correo electrónico",
+        widget=forms.EmailInput(attrs={"class": "form-control"})
+    )
+    password = forms.CharField(
+        label="Contraseña",
+        widget=forms.PasswordInput(attrs={"class": "form-control"})
+    )

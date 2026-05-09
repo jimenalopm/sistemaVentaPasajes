@@ -16,24 +16,25 @@ from rutas.models import Horario, Bus
 @login_required(login_url="/usuarios/login/")
 # @login_required protege esta vista: si el usuario NO está logueado
 # lo redirige automáticamente al login en vez de mostrar la página
+
 def comprar(request, horario_id):
     # Buscamos el horario elegido o devolvemos error 404 si no existe
     horario = get_object_or_404(Horario.objects.select_related("ruta"), id=horario_id)
     cliente = request.user.cliente  # accedemos al perfil del usuario logueado
 
-    # ── Validación 1: el cliente no puede tener más de 5 tiquetes ──
+    #Validación 1: el cliente no puede tener más de 5 tiquetes
     total_tiquetes = Tiquete.objects.filter(cliente=cliente).count()
     if total_tiquetes >= 5:
         messages.error(request, "No podés comprar más de 5 pasajes en total.")
         return redirect("rutas:lista_rutas")
 
-    # ── Validación 2: el cliente debe tener una tarjeta registrada ──
+    # Validación 2: el cliente debe tener una tarjeta registrada 
     tarjetas = cliente.tarjetas.all()
     if not tarjetas.exists():
         messages.warning(request, "Necesitás registrar una tarjeta antes de comprar.")
         return redirect("rutas:lista_rutas")
 
-    # ── Calculamos el rango de fechas permitidas (maximo 1 semana) ──
+    #  Calculamos el rango de fechas permitidas (maximo 1 semana) 
     hoy = timezone.now().date()
     fecha_min = hoy + timedelta(days=1)   # minimo mañana
     fecha_max = hoy + timedelta(days=7)   # maximo 7 días
@@ -57,7 +58,7 @@ def comprar(request, horario_id):
             messages.error(request, "Fecha inválida.")
             return redirect("tiquetes:comprar", horario_id=horario_id)
 
-        # ── Validación 3: la fecha debe estar dentro del rango ──
+        #  Validación 3: la fecha debe estar dentro del rango 
         if fecha_salida < fecha_min or fecha_salida > fecha_max:
             messages.error(request, f"La fecha debe estar entre {fecha_min} y {fecha_max}.")
             return redirect("tiquetes:comprar", horario_id=horario_id)
@@ -76,13 +77,13 @@ def comprar(request, horario_id):
         # Usamos la primera tarjeta del cliente
         tarjeta = tarjetas.first()
 
-        # ── Generamos el código único del tiquete ──
+        #  Generamos el código único del tiquete 
         # uuid4() genera un código aleatorio, tomamos los primeros 8 caracteres
         # y lo combinamos con el código de ruta para que sea más legible
         # Ejemplo: CR-NI-A3F9B2C1
         codigo_unico = f"{horario.ruta.codigo_ruta}-{str(uuid.uuid4()).upper()[:8]}"
 
-        # ── Creamos el tiquete en la base de datos ──
+        #  Creamos el tiquete en la base de datos 
         tiquete = Tiquete.objects.create(
             horario=horario,
             tarjeta=tarjeta,
@@ -109,7 +110,7 @@ def comprar(request, horario_id):
     })
 
 
-─
+
 # PASO 2: Ver mis tiquetes comprados
 # URL: /tiquetes/mis-tiquetes/
 
@@ -153,11 +154,11 @@ def descargar_pdf(request, tiquete_id):
     p = canvas.Canvas(buffer, pagesize=A4)
     ancho, alto = A4  # A4 = 595 x 842 puntos
 
-    # ── Fondo del encabezado ──
+    #  Fondo del encabezado 
     p.setFillColor(colors.HexColor("#1a1a2e"))
     p.rect(0, alto - 120, ancho, 120, fill=True, stroke=False)
 
-    # ── Título del encabezado ──
+    #  Título del encabezado 
     p.setFillColor(colors.white)
     p.setFont("Helvetica-Bold", 22)
     p.drawString(2 * cm, alto - 50, "🚌 Transportes Centroamericanos")
@@ -165,7 +166,7 @@ def descargar_pdf(request, tiquete_id):
     p.setFont("Helvetica", 12)
     p.drawString(2 * cm, alto - 75, "Comprobante Electrónico de Viaje")
 
-    # ── Caja del código del tiquete (lo más importante) ──
+    #  Caja del código del tiquete (lo más importante) 
     p.setFillColor(colors.HexColor("#e94560"))
     p.roundRect(2 * cm, alto - 200, ancho - 4 * cm, 60, 10, fill=True, stroke=False)
 
@@ -175,7 +176,7 @@ def descargar_pdf(request, tiquete_id):
     p.setFont("Helvetica-Bold", 18)
     p.drawCentredString(ancho / 2, alto - 185, tiquete.codigo)
 
-    # ── Datos del pasaje ──
+    #  Datos del pasaje 
     p.setFillColor(colors.HexColor("#1a1a2e"))
     p.setFont("Helvetica-Bold", 14)
     p.drawString(2 * cm, alto - 240, "Información del Viaje")
@@ -208,7 +209,7 @@ def descargar_pdf(request, tiquete_id):
         p.drawString(7 * cm, y, valor)
         y -= 28  # bajamos para el siguiente dato
 
-    # ── Datos del pasajero ──
+    #  Datos del pasajero 
     p.setFillColor(colors.HexColor("#1a1a2e"))
     p.setFont("Helvetica-Bold", 14)
     p.drawString(2 * cm, y - 10, "Datos del Pasajero")
@@ -233,7 +234,7 @@ def descargar_pdf(request, tiquete_id):
         p.drawString(7 * cm, y, valor)
         y -= 28
 
-    # ── Pie de página ──
+    #  Pie de página 
     p.setFillColor(colors.HexColor("#f0f0f0"))
     p.rect(0, 0, ancho, 60, fill=True, stroke=False)
     p.setFillColor(colors.gray)
