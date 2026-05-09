@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis Tiquetes{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">🎫 Mis Tiquetes</h2>
+            <p class="text-muted mb-0">Historial de pasajes comprados</p>
+        </div>
+        <a href="{% url 'rutas:lista_rutas' %}" class="btn btn-primary rounded-pill px-4">
+            + Comprar nuevo pasaje
+        </a>
+    </div>
+
+    {% if tiquetes %}
+        <div class="row g-4">
+            {% for tiquete in tiquetes %}
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                    {# Encabezado con el código único #}
+                    <div class="card-header bg-dark text-white rounded-top-4 py-3 d-flex justify-content-between align-items-center">
+                        <span class="fw-bold">{{ tiquete.horario.ruta.codigo_ruta }}</span>
+                        <span class="badge bg-danger fs-6">{{ tiquete.codigo }}</span>
+                    </div>
+
+                    <div class="card-body p-4">
+                        {# Ruta #}
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="text-center">
+                                <div class="text-muted small">Desde</div>
+                                <div class="fw-bold">{{ tiquete.horario.ruta.lugar_salida }}</div>
+                            </div>
+                            <div class="text-muted">✈️</div>
+                            <div class="text-center">
+                                <div class="text-muted small">Hasta</div>
+                                <div class="fw-bold">{{ tiquete.horario.ruta.lugar_llegada }}</div>
+                            </div>
+                        </div>
+
+                        <hr class="my-2">
+
+                        {# Datos del viaje #}
+                        <div class="row text-center g-2 mb-3">
+                            <div class="col-4">
+                                <div class="text-muted small">Fecha</div>
+                                <div class="fw-semibold">{{ tiquete.fecha_salida|date:"d/m/Y" }}</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-muted small">Hora</div>
+                                <div class="fw-semibold">{{ tiquete.horario.hora_salida|time:"H:i" }}</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-muted small">Monto</div>
+                                <div class="fw-semibold text-success">${{ tiquete.monto_pagado }}</div>
+                            </div>
+                        </div>
+
+                        {# Botón de descargar PDF #}
+                        <a href="{% url 'tiquetes:pdf' tiquete.id %}"
+                           class="btn btn-outline-dark w-100 rounded-pill">
+                            📄 Descargar comprobante PDF
+                        </a>
+                    </div>
+
+                    <div class="card-footer text-muted small rounded-bottom-4">
+                        Comprado el {{ tiquete.fecha_compra|date:"d/m/Y" }} a las {{ tiquete.fecha_compra|time:"H:i" }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        {# Si no tiene tiquetes #}
+        <div class="text-center py-5">
+            <div class="display-1 mb-3">🎫</div>
+            <h4 class="text-muted">No tenés tiquetes comprados aún</h4>
+            <a href="{% url 'rutas:lista_rutas' %}" class="btn btn-primary mt-3 rounded-pill px-5">
+                Ver rutas disponibles
+            </a>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

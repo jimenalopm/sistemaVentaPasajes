@@ -1,62 +1,95 @@
 {% extends 'base.html' %}
 
-{% block title %}Inicio - Transportes Centroamericanos{% endblock %}
+{% block title %}Rutas y Horarios - Transportes Centroamericanos{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <div class="p-5 mb-5 bg-body-tertiary rounded-5 shadow-lg text-center border">
-        <div class="container-fluid py-4">
-            
-            <div class="mb-4 display-6">
-                🇸🇻 🇭🇳 🇳🇮 🇨🇷 🇵🇦
-            </div>
 
-            <h1 class="display-4 fw-bold text-dark mb-3">
-                CONECTANDO <span class="text-primary">CENTROAMÉRICA</span>
-            </h1>
-            
-            <p class="col-md-8 mx-auto fs-5 text-secondary mb-4">
-                Somos líderes en el transporte terrestre de pasajeros, vinculando y comprometiendo a las comunidades de la zona sur con rutas seguras y eficientes.
-            </p>
+    <h2 class="mb-1 fw-bold">🗺️ Rutas y Horarios Disponibles</h2>
+    <p class="text-muted mb-4">Seleccioná tu destino y comprá tu pasaje en línea.</p>
 
-            <div class="d-flex justify-content-center gap-3">
-                <a href="{% url 'rutas:lista_rutas' %}" class="btn btn-primary btn-lg px-5 rounded-pill shadow">
-                    Buscar Pasajes
-                </a>
-                <button class="btn btn-outline-dark btn-lg px-5 rounded-pill">
-                    Sobre Nosotros
-                </button>
-            </div>
+    {% if user.is_authenticated %}
+        {# Si el usuario está logueado mostramos la tabla con botones de compra #}
+        <div class="table-responsive shadow-sm rounded-3">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Ruta</th>
+                        <th>Salida</th>
+                        <th>Destino</th>
+                        <th>Hora</th>
+                        <th>Precio</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for horario in horarios %}
+                    <tr>
+                        <td><span class="badge bg-primary">{{ horario.ruta.codigo_ruta }}</span></td>
+                        <td>{{ horario.ruta.lugar_salida }}</td>
+                        <td>{{ horario.ruta.lugar_llegada }}</td>
+                        <td>{{ horario.hora_salida|time:"H:i" }} AM/PM</td>
+                        <td class="fw-bold text-success">${{ horario.ruta.precio }}</td>
+                        <td>
+                            {# El link de comprar lleva el ID del horario para saber cuál eligió #}
+                            <a href="{% url 'tiquetes:comprar' horario.id %}"
+                               class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                Comprar →
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                        {# Si no hay horarios en la base de datos #}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                No hay horarios disponibles. Cargá los fixtures primero.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    </div>
 
-    <div class="row justify-content-center g-4 pb-5">
-        
-        <div class="col-md-5">
-            <div class="card border-0 shadow-sm rounded-4 h-100 p-3 text-center">
-                <div class="card-body d-flex flex-column">
-                    <div class="display-4 mb-3 text-primary">🗺️</div>
-                    <h3 class="fw-bold h4">Rutas y Horarios</h3>
-                    <p class="text-muted flex-grow-1">Consulta salidas y destinos de forma rápida y sencilla.</p>
-                    <a href="{% url 'rutas:lista_rutas' %}" class="btn btn-link text-decoration-none fw-bold">
-                        Ver detalles →
-                    </a>
-                </div>
-            </div>
+        {# Enlace a mis tiquetes #}
+        <div class="mt-4 text-end">
+            <a href="{% url 'tiquetes:mis_tiquetes' %}" class="btn btn-secondary rounded-pill px-4">
+                📋 Ver mis tiquetes comprados
+            </a>
         </div>
 
-        <div class="col-md-5">
-            <div class="card border-0 shadow-sm rounded-4 h-100 p-3 text-center">
-                <div class="card-body d-flex flex-column">
-                    <div class="display-4 mb-3 text-success">💳</div>
-                    <h3 class="fw-bold h4">Compras en línea</h3>
-                    <p class="text-muted flex-grow-1">Asegura tu espacio sin filas. Pago seguro y rápido.</p>
-                    <a href="{% url 'rutas:lista_rutas' %}" class="btn btn-link text-decoration-none fw-bold text-success">
-                        Comprar ahora →
-                    </a>
-                </div>
-            </div>
+    {% else %}
+        {# Si NO está logueado mostramos la tabla pero sin botón de comprar #}
+        <div class="alert alert-warning rounded-3">
+            <strong> Debés iniciar sesión</strong> para poder comprar pasajes.
+            <a href="{% url 'usuarios:login' %}" class="btn btn-sm btn-warning ms-3">Iniciar sesión</a>
+            <a href="{% url 'usuarios:registro' %}" class="btn btn-sm btn-outline-dark ms-2">Registrarse</a>
         </div>
-    </div>
+
+        <div class="table-responsive shadow-sm rounded-3">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Ruta</th>
+                        <th>Salida</th>
+                        <th>Destino</th>
+                        <th>Hora</th>
+                        <th>Precio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for horario in horarios %}
+                    <tr>
+                        <td><span class="badge bg-primary">{{ horario.ruta.codigo_ruta }}</span></td>
+                        <td>{{ horario.ruta.lugar_salida }}</td>
+                        <td>{{ horario.ruta.lugar_llegada }}</td>
+                        <td>{{ horario.hora_salida|time:"H:i" }}</td>
+                        <td class="fw-bold text-success">${{ horario.ruta.precio }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
 </div>
 {% endblock %}
