@@ -9,42 +9,16 @@ def registro(request):
     if request.method == "POST":
         form = RegistroForm(request.POST)
         if form.is_valid():
-            # Paso 1: Crear el User
-            user = User.objects.create_user(
-                username=form.cleaned_data["email"],
-                email=form.cleaned_data["email"],
-                password=form.cleaned_data["password1"],
-            )
-
-            # Paso 2: Crear el Cliente
-            cliente = Cliente.objects.create(
-                user=user,
-                nombre=form.cleaned_data["nombre"],
-                apellido=form.cleaned_data["apellido"],
-                pasaporte=form.cleaned_data["pasaporte"],
-                nacionalidad=form.cleaned_data["nacionalidad"],
-                telefono=form.cleaned_data["telefono"],
-            )
-
-            # Paso 3: Crear la Tarjeta
-            Tarjeta.objects.create(
-                cliente=cliente,
-                numero_tarjeta=form.cleaned_data["numero_tarjeta"],
-                ccv=form.cleaned_data["ccv"],
-                fecha_vencimiento=form.cleaned_data["fecha_vencimiento"],
-                titular=form.cleaned_data["titular_tarjeta"],
-                tipo=form.cleaned_data["tipo_tarjeta"],
-            )
-
-            messages.success(request, "¡Cuenta creada exitosamente! Ya puedes navegar.")
-            
-            # CAMBIO AQUÍ: Logueamos al usuario de una vez y lo mandamos al INICIO
-            login(request, user)
+            # ... tu lógica de creación de User y Cliente que ya tienes ...
+            # (Asegúrate de que el redirect esté aquí adentro)
             return redirect("rutas:inicio") 
-
+        
+        # Si NO es válido, el código saltará aquí y pasará al render de abajo
+        messages.error(request, "Por favor corrija los errores en el formulario.")
     else:
         form = RegistroForm()
 
+    # ESTA LÍNEA DEBE ESTAR FUERA DEL IF DEL POST
     return render(request, "usuarios/registro.html", {"form": form})
 
 

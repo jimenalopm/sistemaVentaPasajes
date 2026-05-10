@@ -6,7 +6,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-end mb-3">
     <a href="{% url 'rutas:inicio' %}" class="btn btn-outline-secondary">
-        🏠 Volver al Inicio
+         Volver al Inicio
     </a>
 </div>
     
@@ -31,7 +31,7 @@
                                 <div class="text-muted small">Desde</div>
                                 <div class="fw-bold">{{ tiquete.horario.ruta.lugar_salida }}</div>
                             </div>
-                            <div class="text-muted">✈️</div>
+                            <div class="text-muted"></div>
                             <div class="text-center">
                                 <div class="text-muted small">Hasta</div>
                                 <div class="fw-bold">{{ tiquete.horario.ruta.lugar_llegada }}</div>
@@ -59,7 +59,7 @@
                         {# Botón de descargar PDF #}
                         <a href="{% url 'tiquetes:pdf' tiquete.id %}"
                            class="btn btn-outline-dark w-100 rounded-pill">
-                            📄 Descargar comprobante PDF
+                             Descargar comprobante PDF
                         </a>
                     </div>
 
@@ -74,7 +74,7 @@
     {% else %}
         {# Si no tiene tiquetes #}
         <div class="text-center py-5">
-            <div class="display-1 mb-3">🎫</div>
+            <div class="display-1 mb-3"></div>
             <h4 class="text-muted">No tenés tiquetes comprados aún</h4>
             <a href="{% url 'rutas:lista_rutas' %}" class="btn btn-primary mt-3 rounded-pill px-5">
                 Ver rutas disponibles

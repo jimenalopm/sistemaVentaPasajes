@@ -1,32 +1,37 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 
-{% block title %}Registrarse{% endblock %} # el mismo que esta en html base y lo cambiamos aqui 
+{% block title %}Registrarse{% endblock %}
 
 {% block content %}
-
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card shadow">
+        <div class="card shadow border-0 rounded-4">
             <div class="card-body p-4">
-                <h3 class="card-title text-center mb-4">Crear cuenta</h3>
+                <h3 class="card-title text-center mb-4 fw-bold">Crear cuenta</h3>
 
                 <form method="POST">
-                    {% csrf_token %} {# Genera un campo oculto con un token único guardado también en la sesión del servidor.Cuando el form se envía, Django compara los dos tokens:si coinciden, procesa el POST; si no, lo rechaza.Esto evita que sitios maliciosos envíen formularios usando tu sesión. #} 
-                    {{ form|crispy }}  # esto va generando automaticamente los campos del formulario con los datos que estan ya definidos en forms.py
-                    <div class="d-grid mt-3">
-                        <button type="submit" class="btn btn-primary btn-lg">
+                    {% csrf_token %}
+                    {{ form|crispy }}  
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
                             Registrarse
                         </button>
+                        
+                        {# BOTÓN DE VOLVER AL INICIO #}
+                        <a href="{% url 'rutas:inicio' %}" class="btn btn-outline-secondary rounded-pill">
+                             Volver al Inicio
+                        </a>
                     </div>
                 </form>
 
-                <p class="text-center mt-3">
+                <p class="text-center mt-4 mb-0">
                     ¿Ya tiene cuenta?
-                    <a href="/usuarios/login/">Iniciá sesión</a>
+                    <a href="{% url 'usuarios:login' %}" class="fw-bold text-decoration-none">Iniciá sesión</a>
                 </p>
             </div>
         </div>
     </div>
 </div>
-{% endblock %} # este es el mismo que esta en html base y se rellena con esto 
+{% endblock %}
