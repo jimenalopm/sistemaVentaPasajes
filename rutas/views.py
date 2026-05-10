@@ -9,4 +9,4 @@ def lista_rutas(request):
     })
 
 def inicio(request):
-    return render(request, "rutas/lista.html")
+    return render(request, "rutas/inicio.html")

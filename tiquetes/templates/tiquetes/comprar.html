@@ -43,12 +43,12 @@
             {# ── Formulario de compra ── #}
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body p-4">
-                    <h5 class="fw-bold mb-4">📅 Seleccioná la fecha de viaje</h5>
+                    <h5 class="fw-bold mb-4">📅 Datos de Pago y Viaje</h5>
 
                     <form method="POST">
                         {% csrf_token %}
 
-                        {# Campo de fecha con rango permitido (hoy+1 hasta hoy+7) #}
+                        {# Campo de fecha #}
                         <div class="mb-4">
                             <label class="form-label fw-semibold">Fecha de salida</label>
                             <input
@@ -59,23 +59,45 @@
                                 max="{{ fecha_max|date:'Y-m-d' }}"
                                 required
                             >
-                            <div class="form-text">Podés comprar hasta 7 días de anticipación.</div>
                         </div>
 
-                        {# Tarjeta que se va a usar (la primera registrada) #}
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">Tarjeta de pago</label>
-                            {% for tarjeta in tarjetas %}
-                            <div class="alert alert-light border rounded-3 mb-2">
-                                💳 {{ tarjeta.tipo }} terminada en
-                                <strong>{{ tarjeta.numero_tarjeta|slice:"-4:" }}</strong>
-                                — Titular: {{ tarjeta.titular }}
-                            </div>
-                            {% endfor %}
-                        </div>
+                        {# --- NUEVA SECCIÓN: DATOS DE LA TARJETA --- #}
+                        <div class="p-3 bg-light rounded-3 border mb-4">
+    <h6 class="fw-bold mb-3">💳 Información de la Tarjeta</h6>
+    
+    <div class="mb-3">
+        <label class="small fw-bold">Nombre en la tarjeta</label>
+        {# El atributo 'required' es la clave aquí #}
+        <input type="text" name="titular" class="form-control" placeholder="Nombre completo" required>
+    </div>
+
+    <div class="mb-3">
+    <label class="small fw-bold">Número de tarjeta</label>
+    <input 
+        type="text" 
+        name="numero_tarjeta" 
+        class="form-control" 
+        placeholder="XXXX XXXX XXXX XXXX" 
+        pattern="[0-9 ]{16,19}" 
+        title="Debes ingresar los 16 dígitos de la tarjeta"
+        required
+    >
+</div>
+
+    <div class="row">
+        <div class="col-6">
+            <label class="small fw-bold">Expiración</label>
+            <input type="text" name="expiracion" class="form-control" placeholder="MM/YY" required>
+        </div>
+        <div class="col-6">
+            <label class="small fw-bold">CVV</label>
+            <input type="password" name="cvv" class="form-control" placeholder="123" maxlength="3" required>
+        </div>
+    </div>
+</div>
 
                         <div class="d-flex gap-3">
-                            <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill">
+                            <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
                                 ✅ Confirmar Compra
                             </button>
                             <a href="{% url 'rutas:lista_rutas' %}" class="btn btn-outline-secondary btn-lg rounded-pill">

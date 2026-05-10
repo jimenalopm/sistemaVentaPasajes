@@ -5,21 +5,18 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import RegistroForm, LoginForm
 from .models import Cliente, Tarjeta
 
-
 def registro(request):
     if request.method == "POST":
         form = RegistroForm(request.POST)
         if form.is_valid():
-
-            #Paso 1: Crear el User de Django 
-            # create_user hashea la contraseña automáticamente, nunca se guarda en texto plano
+            # Paso 1: Crear el User
             user = User.objects.create_user(
                 username=form.cleaned_data["email"],
                 email=form.cleaned_data["email"],
                 password=form.cleaned_data["password1"],
             )
 
-            #  Paso 2: Crear el Cliente vinculado al User 
+            # Paso 2: Crear el Cliente
             cliente = Cliente.objects.create(
                 user=user,
                 nombre=form.cleaned_data["nombre"],
@@ -29,8 +26,7 @@ def registro(request):
                 telefono=form.cleaned_data["telefono"],
             )
 
-            #  Paso 3: Crear la Tarjeta vinculada al Cliente 
-            # Aquí es lo nuevo: guardamos la tarjeta en la misma operación del registro
+            # Paso 3: Crear la Tarjeta
             Tarjeta.objects.create(
                 cliente=cliente,
                 numero_tarjeta=form.cleaned_data["numero_tarjeta"],
@@ -40,11 +36,13 @@ def registro(request):
                 tipo=form.cleaned_data["tipo_tarjeta"],
             )
 
-            messages.success(request, "¡Cuenta creada exitosamente! Iniciá sesión.")
-            return redirect("usuarios:login")
+            messages.success(request, "¡Cuenta creada exitosamente! Ya puedes navegar.")
+            
+            # CAMBIO AQUÍ: Logueamos al usuario de una vez y lo mandamos al INICIO
+            login(request, user)
+            return redirect("rutas:inicio") 
 
     else:
-        # Si el usuario apenas abre la página, mostramos el formulario vacío
         form = RegistroForm()
 
     return render(request, "usuarios/registro.html", {"form": form})
@@ -55,9 +53,11 @@ def login_view(request):
         form = LoginForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            login(request, user)  # esto crea la sesión en el navegador
+            login(request, user)
             messages.success(request, f"¡Bienvenido de nuevo, {user.cliente.nombre}!")
-            return redirect("rutas:lista_rutas")
+            
+            # CAMBIO AQUÍ: Redirigir a tu diseño de inicio
+            return redirect("rutas:inicio")
     else:
         form = LoginForm()
 
@@ -65,6 +65,8 @@ def login_view(request):
 
 
 def logout_view(request):
-    logout(request)  # elimina la sesión
+    logout(request)
     messages.info(request, "Cerraste sesión correctamente.")
-    return redirect("/")
+    
+    # CAMBIO AQUÍ: Al salir, que vuelva a tu diseño de inicio
+    return redirect("rutas:inicio")
