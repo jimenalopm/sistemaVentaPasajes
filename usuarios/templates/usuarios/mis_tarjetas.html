@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis Tarjetas{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold mb-0">💳 Mis Tarjetas</h3>
+            <a href="{% url 'usuarios:agregar_tarjeta' %}" class="btn btn-primary rounded-pill">
+                + Agregar tarjeta
+            </a>
+        </div>
+
+        {% if tarjetas %}
+            <div class="row g-3">
+                {% for t in tarjetas %}
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm rounded-4">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <span class="badge bg-dark fs-6">{{ t.tipo }}</span>
+                                    <form method="POST" action="{% url 'usuarios:eliminar_tarjeta' t.id %}"
+                                          onsubmit="return confirm('¿Eliminar esta tarjeta?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="fs-5 fw-bold text-monospace mb-2">
+                                    •••• •••• •••• {{ t.numero_tarjeta|slice:"-4:" }}
+                                </div>
+                                <div class="text-muted small">Titular</div>
+                                <div class="fw-semibold mb-2">{{ t.titular }}</div>
+                                <div class="text-muted small">Vence</div>
+                                <div class="fw-semibold">{{ t.fecha_vencimiento|date:"m/y" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info rounded-4">
+                Todavía no tenés tarjetas registradas. Podés agregar una ahora o hacerlo al momento de comprar.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

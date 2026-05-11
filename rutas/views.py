@@ -10,3 +10,6 @@ def lista_rutas(request):
 
 def inicio(request):
     return render(request, "rutas/inicio.html")
+
+def contacto(request):
+    return render(request, "rutas/contacto.html")

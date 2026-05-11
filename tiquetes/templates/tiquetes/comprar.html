@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container mt-4">
     <div class="row justify-content-center">
-        <div class="col-md-7">
+        <div class="col-md-8">
 
             {# ── Resumen del viaje elegido ── #}
             <div class="card border-0 shadow-sm rounded-4 mb-4">
@@ -28,13 +28,20 @@
                     </div>
                     <hr>
                     <div class="row text-center">
-                        <div class="col-6">
+                        <div class="col-4">
                             <div class="text-muted small">Hora de salida</div>
                             <div class="fw-bold">{{ horario.hora_salida|time:"H:i" }}</div>
                         </div>
-                        <div class="col-6">
-                            <div class="text-muted small">Precio</div>
+                        <div class="col-4">
+                            <div class="text-muted small">Precio unitario</div>
                             <div class="fw-bold text-success fs-5">${{ horario.ruta.precio }}</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-muted small">Total</div>
+                            <div class="fw-bold text-success fs-5" id="total-compra"
+                                 data-precio="{{ horario.ruta.precio }}">
+                                ${{ horario.ruta.precio }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -43,12 +50,11 @@
             {# ── Formulario de compra ── #}
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body p-4">
-                    <h5 class="fw-bold mb-4">📅 Datos de Pago y Viaje</h5>
+                    <h5 class="fw-bold mb-4">📅 Datos del Viaje y Pago</h5>
 
                     <form method="POST">
                         {% csrf_token %}
 
-                        {# Campo de fecha #}
                         <div class="mb-4">
                             <label class="form-label fw-semibold">Fecha de salida</label>
                             <input
@@ -61,40 +67,103 @@
                             >
                         </div>
 
-                        {# --- NUEVA SECCIÓN: DATOS DE LA TARJETA --- #}
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">
+                                Cantidad de tiquetes
+                                <small class="text-muted fw-normal">(podés comprar hasta {{ disponibles }})</small>
+                            </label>
+                            <select name="cantidad" id="cantidad" class="form-select form-select-lg" required>
+                                {% for n in rango_cantidad %}
+                                    <option value="{{ n }}">{{ n }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        {# ── Método de pago ── #}
                         <div class="p-3 bg-light rounded-3 border mb-4">
-    <h6 class="fw-bold mb-3"> Información de la Tarjeta</h6>
-    
-    <div class="mb-3">
-        <label class="small fw-bold">Nombre en la tarjeta</label>
-        {# El atributo 'required' es la clave aquí #}
-        <input type="text" name="titular" class="form-control" placeholder="Nombre completo" required>
-    </div>
+                            <h6 class="fw-bold mb-3">💳 Método de Pago</h6>
 
-    <div class="mb-3">
-    <label class="small fw-bold">Número de tarjeta</label>
-    <input 
-        type="text" 
-        name="numero_tarjeta" 
-        class="form-control" 
-        placeholder="XXXX XXXX XXXX XXXX" 
-        pattern="[0-9 ]{16,19}" 
-        title="Debes ingresar los 16 dígitos de la tarjeta"
-        required
-    >
-</div>
+                            {% if tiene_tarjetas %}
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="metodo_pago"
+                                           value="existente" id="metodo_existente" checked>
+                                    <label class="form-check-label fw-semibold" for="metodo_existente">
+                                        Usar una tarjeta registrada
+                                    </label>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" name="metodo_pago"
+                                           value="nueva" id="metodo_nueva">
+                                    <label class="form-check-label fw-semibold" for="metodo_nueva">
+                                        Usar una tarjeta nueva
+                                    </label>
+                                </div>
+                            {% else %}
+                                <p class="text-muted small mb-3">No tenés tarjetas registradas. Ingresá los datos de la tarjeta para pagar.</p>
+                                <input type="hidden" name="metodo_pago" value="nueva">
+                            {% endif %}
 
-    <div class="row">
-        <div class="col-6">
-            <label class="small fw-bold">Expiración</label>
-            <input type="text" name="expiracion" class="form-control" placeholder="MM/YY" required>
-        </div>
-        <div class="col-6">
-            <label class="small fw-bold">CVV</label>
-            <input type="password" name="cvv" class="form-control" placeholder="123" maxlength="3" required>
-        </div>
-    </div>
-</div>
+                            {# ── Bloque: tarjeta existente ── #}
+                            {% if tiene_tarjetas %}
+                            <div id="bloque_existente" class="border rounded-3 p-3 bg-white mb-3">
+                                <label class="small fw-bold mb-2">Seleccioná la tarjeta</label>
+                                {% for t in tarjetas %}
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="tarjeta_id"
+                                               value="{{ t.id }}" id="tarjeta_{{ t.id }}"
+                                               {% if forloop.first %}checked{% endif %}>
+                                        <label class="form-check-label" for="tarjeta_{{ t.id }}">
+                                            <span class="badge bg-dark">{{ t.tipo }}</span>
+                                            •••• {{ t.numero_tarjeta|slice:"-4:" }}
+                                            <span class="text-muted small">— {{ t.titular }}</span>
+                                        </label>
+                                    </div>
+                                {% endfor %}
+
+                                <div class="mt-3">
+                                    <label class="small fw-bold">Ingresá tu CCV para confirmar</label>
+                                    <input type="password" name="cvv" class="form-control"
+                                           placeholder="•••" maxlength="4">
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {# ── Bloque: tarjeta nueva ── #}
+                            <div id="bloque_nueva" class="border rounded-3 p-3 bg-white"
+                                 {% if tiene_tarjetas %}style="display:none;"{% endif %}>
+                                <div class="mb-2">
+                                    <label class="small fw-bold">Nombre en la tarjeta</label>
+                                    <input type="text" name="titular_tarjeta" class="form-control">
+                                </div>
+                                <div class="row g-2 mb-2">
+                                    <div class="col-md-7">
+                                        <label class="small fw-bold">Número de tarjeta</label>
+                                        <input type="text" name="numero_tarjeta" class="form-control" maxlength="19">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="small fw-bold">Tipo</label>
+                                        <select name="tipo" class="form-select">
+                                            <option value="Visa">Visa</option>
+                                            <option value="MasterCard">MasterCard</option>
+                                            <option value="American Express">American Express</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row g-2 mb-2">
+                                    <div class="col-md-6">
+                                        <label class="small fw-bold">Vencimiento (MM/YY)</label>
+                                        <input type="text" name="expiracion" class="form-control" maxlength="5" placeholder="MM/YY">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="small fw-bold">CCV</label>
+                                        <input type="password" name="ccv_nueva" class="form-control" maxlength="4" placeholder="•••">
+                                    </div>
+                                </div>
+                                <p class="text-muted small mt-3 mb-0">
+                                    La tarjeta quedará guardada en tu perfil para futuras compras.
+                                </p>
+                            </div>
+                        </div>
 
                         <div class="d-flex gap-3">
                             <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
@@ -111,4 +180,32 @@
         </div>
     </div>
 </div>
+
+<script>
+    (function () {
+        const select = document.getElementById('cantidad');
+        const total = document.getElementById('total-compra');
+        if (select && total) {
+            const precio = parseFloat(total.dataset.precio);
+            select.addEventListener('change', function () {
+                const cantidad = parseInt(this.value, 10) || 1;
+                total.textContent = '$' + (precio * cantidad).toFixed(2);
+            });
+        }
+
+        const radioExistente = document.getElementById('metodo_existente');
+        const radioNueva = document.getElementById('metodo_nueva');
+        const bloqueExistente = document.getElementById('bloque_existente');
+        const bloqueNueva = document.getElementById('bloque_nueva');
+
+        function toggleMetodo() {
+            if (!radioExistente || !radioNueva) return;
+            const usarExistente = radioExistente.checked;
+            if (bloqueExistente) bloqueExistente.style.display = usarExistente ? '' : 'none';
+            if (bloqueNueva) bloqueNueva.style.display = usarExistente ? 'none' : '';
+        }
+        if (radioExistente) radioExistente.addEventListener('change', toggleMetodo);
+        if (radioNueva) radioNueva.addEventListener('change', toggleMetodo);
+    })();
+</script>
 {% endblock %}
